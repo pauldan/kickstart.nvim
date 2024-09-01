@@ -19,8 +19,12 @@ vim.keymap.set('x', '<leader>pp', [["_dP]])
 -- copy to system clipboard
 vim.keymap.set({ 'n', 'v' }, '<leader>y', [["+y]])
 vim.keymap.set('n', '<leader>Y', [["+Y]])
+-- delete to void
+vim.keymap.set({ 'n', 'v' }, '<leader>d', [["_d]])
 
 -- format whole file
 vim.keymap.set('n', '<A-f>', 'ggVG=')
 
 vim.keymap.set('n', 'Q', '<nop>')
+
+vim.keymap.set('n', '<leader>ee', 'oif err != nil {<CR>}<Esc>Oreturn err<Esc>')
