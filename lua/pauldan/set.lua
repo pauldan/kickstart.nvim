@@ -1,3 +1,8 @@
+vim.opt.shell = 'bash'
+vim.opt.shellcmdflag = '-c'
+vim.opt.shellxquote = '""'
+vim.opt.shellslash = true
+
 vim.opt.nu = true
 vim.opt.rnu = true
 

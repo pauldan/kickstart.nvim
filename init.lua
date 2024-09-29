@@ -1,6 +1,7 @@
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
+
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
@@ -217,7 +218,8 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+      --{ 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+      { 'nvim-tree/nvim-web-devicons' },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -297,6 +299,16 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sn', function()
         builtin.find_files { cwd = vim.fn.stdpath 'config' }
       end, { desc = '[S]earch [N]eovim files' })
+    end,
+  },
+  {
+    'mbbill/undotree',
+    config = function()
+      vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle)
+      vim.opt.swapfile = false
+      vim.opt.backup = false
+      vim.opt.undodir = os.getenv 'HOME' .. '/.vim/undodir'
+      vim.opt.undofile = true
     end,
   },
 
@@ -461,6 +473,69 @@ require('lazy').setup({
           -- clangd = {},
           gopls = {},
           templ = {},
+          intelephense = {
+            settings = {
+              intelephense = {
+                stubs = {
+                  'bcmath',
+                  'bz2',
+                  'Core',
+                  'curl',
+                  'date',
+                  'dom',
+                  'fileinfo',
+                  'filter',
+                  'gd',
+                  'gettext',
+                  'hash',
+                  'iconv',
+                  'imap',
+                  'intl',
+                  'json',
+                  'libxml',
+                  'mbstring',
+                  'mcrypt',
+                  'mysql',
+                  'mysqli',
+                  'password',
+                  'pcntl',
+                  'pcre',
+                  'PDO',
+                  'pdo_mysql',
+                  'Phar',
+                  'readline',
+                  'regex',
+                  'session',
+                  'SimpleXML',
+                  'sockets',
+                  'sodium',
+                  'standard',
+                  'superglobals',
+                  'tokenizer',
+                  'xml',
+                  'xdebug',
+                  'xmlreader',
+                  'xmlwriter',
+                  'yaml',
+                  'zip',
+                  'zlib',
+                  'wordpress-stubs',
+                  'woocommerce-stubs',
+                  'acf-pro-stubs',
+                  'wordpress-globals',
+                  'wp-cli-stubs',
+                  'genesis-stubs',
+                  'polylang-stubs',
+                },
+                environment = {
+                  includePaths = { 'C:/Users/Paul/AppData/Roaming/Composer/vendor/php-stubs/' },
+                },
+                files = {
+                  maxSize = 50000000,
+                },
+              },
+            },
+          },
           -- pyright = {},
           -- rust_analyzer = {},
           -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
@@ -469,9 +544,7 @@ require('lazy').setup({
           --    https://github.com/pmizio/typescript-tools.nvim
           --
           -- But for many setups, the LSP (`tsserver`) will work just fine
-          tsserver = {},
           --
-
           lua_ls = {
             -- cmd = {...},
             -- filetypes = { ...},
@@ -726,6 +799,42 @@ require('lazy').setup({
       --  Check out: https://github.com/echasnovski/mini.nvim
     end,
   },
+  {
+    'folke/noice.nvim',
+    event = 'VeryLazy',
+    opts = {
+      -- add any options here
+    },
+    dependencies = {
+      -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+      'MunifTanjim/nui.nvim',
+      -- OPTIONAL:
+      --   `nvim-notify` is only needed, if you want to use the notification view.
+      --   If not available, we use `mini` as the fallback
+      'rcarriga/nvim-notify',
+    },
+    config = function()
+      require('noice').setup {
+        lsp = {
+          -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
+          override = {
+            ['vim.lsp.util.convert_input_to_markdown_lines'] = true,
+            ['vim.lsp.util.stylize_markdown'] = true,
+            ['cmp.entry.get_documentation'] = true, -- requires hrsh7th/nvim-cmp
+          },
+        },
+        -- you can enable a preset for easier configuration
+        presets = {
+          bottom_search = true, -- use a classic bottom cmdline for search
+          command_palette = true, -- position the cmdline and popupmenu together
+          long_message_to_split = true, -- long messages will be sent to a split
+          inc_rename = false, -- enables an input dialog for inc-rename.nvim
+          lsp_doc_border = false, -- add a border to hover docs and signature help
+        },
+      }
+    end,
+  },
+
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
