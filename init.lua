@@ -474,6 +474,7 @@ require('lazy').setup({
           gopls = {},
           templ = {},
           intelephense = {
+            capabilities = capabilities,
             settings = {
               intelephense = {
                 stubs = {
@@ -528,7 +529,7 @@ require('lazy').setup({
                   'polylang-stubs',
                 },
                 environment = {
-                  includePaths = { 'C:/Users/Paul/AppData/Roaming/Composer/vendor/php-stubs/' },
+                  includePaths = { os.getenv 'HOME' .. '/AppData/Roaming/Composer/vendor/php-stubs/' },
                 },
                 files = {
                   maxSize = 50000000,
@@ -783,17 +784,17 @@ require('lazy').setup({
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
       --  and try some other statusline plugin
-      local statusline = require 'mini.statusline'
+      --local statusline = require 'mini.statusline'
       -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
+      --statusline.setup { use_icons = vim.g.have_nerd_font }
 
       -- You can configure sections in the statusline by overriding their
       -- default behavior. For example, here we set the section for
       -- cursor location to LINE:COLUMN
       ---@diagnostic disable-next-line: duplicate-set-field
-      statusline.section_location = function()
-        return '%2l:%-2v'
-      end
+      --statusline.section_location = function()
+      --  return '%2l:%-2v'
+      --end
 
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
@@ -805,6 +806,7 @@ require('lazy').setup({
     opts = {
       -- add any options here
     },
+
     dependencies = {
       -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
       'MunifTanjim/nui.nvim',
@@ -812,6 +814,8 @@ require('lazy').setup({
       --   `nvim-notify` is only needed, if you want to use the notification view.
       --   If not available, we use `mini` as the fallback
       'rcarriga/nvim-notify',
+
+      'nvim-lualine/lualine.nvim',
     },
     config = function()
       require('noice').setup {
@@ -830,6 +834,23 @@ require('lazy').setup({
           long_message_to_split = true, -- long messages will be sent to a split
           inc_rename = false, -- enables an input dialog for inc-rename.nvim
           lsp_doc_border = false, -- add a border to hover docs and signature help
+        },
+      }
+      require('lualine').setup {
+        sections = {
+          lualine_x = {
+            {
+              require('noice').api.statusline.mode.get,
+              cond = require('noice').api.statusline.mode.has,
+              color = { fg = '#ff9e64' },
+            },
+          },
+          lualine_c = {
+            {
+              'filename',
+              path = 1,
+            },
+          },
         },
       }
     end,
