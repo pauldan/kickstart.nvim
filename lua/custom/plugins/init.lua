@@ -9,6 +9,22 @@ return {
       vim.keymap.set('n', '<leader>gs', vim.cmd.Git)
     end,
   },
+  --[[
+  {
+    'luckasRanarison/tailwind-tools.nvim',
+    name = 'tailwind-tools',
+    build = ':UpdateRemotePlugins',
+    event = 'LspAttach',
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter',
+      'nvim-telescope/telescope.nvim', -- optional
+      'neovim/nvim-lspconfig', -- optional
+    },
+    config = function()
+      require('tailwind-tools').setup {}
+    end,
+  },
+  ]]
   --[[ 
   {
     'neovim/nvim-lspconfig',

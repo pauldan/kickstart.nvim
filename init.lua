@@ -469,10 +469,25 @@ require('lazy').setup({
         --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
         --  - settings (table): Override the default settings passed when initializing the server.
         --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
+        -- local root_dir = require('lspconfig').util.root_pattern('tailwind.config.js', 'tailwind.config.ts')
+
         local servers = {
           -- clangd = {},
           gopls = {},
           templ = {},
+          tailwindcss = {
+            capabilities = capabilities,
+            settings = {
+              tailwindCSS = {
+                experimental = {
+                  classRegex = {
+                    { 'cva\\(([^)]*)\\)', '["\'`]([^"\'`]*).*?["\'`]' },
+                    { 'cx\\(([^)]*)\\)', "(?:'|\"|`)([^']*)(?:'|\"|`)" },
+                  },
+                },
+              },
+            },
+          },
           intelephense = {
             capabilities = capabilities,
             settings = {
@@ -576,6 +591,7 @@ require('lazy').setup({
         vim.list_extend(ensure_installed, {
           'stylua', -- Used to format Lua code
         })
+
         require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
         require('mason-lspconfig').setup {
@@ -586,6 +602,7 @@ require('lazy').setup({
               -- by the server configuration above. Useful when disabling
               -- certain features of an LSP (for example, turning off formatting for tsserver)
               server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+
               require('lspconfig')[server_name].setup(server)
             end,
           },
@@ -630,7 +647,21 @@ require('lazy').setup({
       },
     },
   },
-
+  {
+    'NvChad/nvim-colorizer.lua',
+    opts = {
+      user_default_options = {
+        --[[
+        mode = 'foreground', -- You can change the mode to "foreground" to colorize foreground color codes
+        RGB = true, -- Enable RGB color notation support
+        RRGGBB = true, -- Enable RRGGBB color notation support
+        names = false, -- Disable color name highlighting (e.g., "red", "blue", etc.)
+        css = true, -- Disable CSS color notation support
+        ]]
+        tailwind = true,
+      },
+    },
+  },
   { -- Autocompletion
     'hrsh7th/nvim-cmp',
     event = 'InsertEnter',
@@ -666,6 +697,7 @@ require('lazy').setup({
       --  into multiple repos for maintenance purposes.
       'hrsh7th/cmp-nvim-lsp',
       'hrsh7th/cmp-path',
+      { 'roobert/tailwindcss-colorizer-cmp.nvim', config = true },
     },
     config = function()
       -- See `:help cmp`
@@ -678,6 +710,9 @@ require('lazy').setup({
           expand = function(args)
             luasnip.lsp_expand(args.body)
           end,
+        },
+        formatting = {
+          format = require('tailwindcss-colorizer-cmp').formatter,
         },
         completion = { completeopt = 'menu,menuone,noinsert' },
 
@@ -840,8 +875,8 @@ require('lazy').setup({
         sections = {
           lualine_x = {
             {
-              require('noice').api.statusline.mode.get,
-              cond = require('noice').api.statusline.mode.has,
+              require('noice').api.status.mode.get(),
+              cond = require('noice').api.status.mode.has(),
               color = { fg = '#ff9e64' },
             },
           },
@@ -898,19 +933,19 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  -- require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
+  --require 'kickstart.plugins.debug',
+  require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.autopairs',
   require 'kickstart.plugins.neo-tree',
-  -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
@@ -932,7 +967,7 @@ require('lazy').setup({
     },
   },
 })
-
 require 'pauldan'
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
