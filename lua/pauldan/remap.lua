@@ -28,3 +28,4 @@ vim.keymap.set('n', '<A-f>', 'ggVG=')
 vim.keymap.set('n', 'Q', '<nop>')
 
 vim.keymap.set('n', '<leader>ee', 'oif err != nil {<CR>}<Esc>Oreturn err<Esc>')
+vim.keymap.set('n', '<leader>pp', 'o<?php<CR>?><Esc>')
