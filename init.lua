@@ -519,6 +519,7 @@ require('lazy').setup({
                   'PDO',
                   'pdo_mysql',
                   'Phar',
+                  'php-8',
                   'readline',
                   'regex',
                   'session',
@@ -830,6 +831,11 @@ require('lazy').setup({
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
+          { name = 'bulma', option = {
+            filetypes = {
+              'templ',
+            },
+          } },
         },
       }
     end,
