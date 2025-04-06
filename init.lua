@@ -480,10 +480,12 @@ require('lazy').setup({
             settings = {
               tailwindCSS = {
                 experimental = {
+                  --[[
                   classRegex = {
                     { 'cva\\(([^)]*)\\)', '["\'`]([^"\'`]*).*?["\'`]' },
                     { 'cx\\(([^)]*)\\)', "(?:'|\"|`)([^']*)(?:'|\"|`)" },
                   },
+                  --]]
                 },
               },
             },
@@ -718,9 +720,10 @@ require('lazy').setup({
         event = 'BufReadPost',
         opts = {
           suggestion = {
-            enabled = not vim.g.ai_cmp,
-            auto_trigger = true,
-            hide_during_completion = vim.g.ai_cmp,
+            --enabled = not vim.g.ai_cmp,
+            enabled = false,
+            --auto_trigger = true,
+            --hide_during_completion = vim.g.ai_cmp,
             keymap = {
               accept = false, -- handled by nvim-cmp / blink.cmp
               accept_word = '<C-m>',
@@ -734,28 +737,20 @@ require('lazy').setup({
             markdown = true,
             help = true,
           },
+          auto_install = true,
         },
         config = function(_, opts)
+          require('copilot').setup(opts)
+
           local copilot_cmp = require 'copilot_cmp'
           copilot_cmp.setup(opts)
 
+          --[[
           vim.lsp.on_attach(function()
             copilot_cmp._on_insert_enter {}
           end, 'copilot')
+          --]]
         end,
-        specs = {
-          'hrsh7th/nvim-cmp',
-          optional = true,
-          ---@param opts cmp.ConfigSchema
-          opts = function(_, opts)
-            print(vim.inspect(opts))
-            table.insert(opts.sources, 1, {
-              name = 'copilot',
-              group_index = 1,
-              priority = 100,
-            })
-          end,
-        },
       },
     }, -- end deps
     config = function()
@@ -763,6 +758,14 @@ require('lazy').setup({
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
       luasnip.config.setup {}
+
+      local has_words_before = function()
+        if vim.api.nvim_buf_get_option(0, 'buftype') == 'prompt' then
+          return false
+        end
+        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+        return col ~= 0 and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match '^%s*$' == nil
+      end
 
       cmp.setup {
         snippet = {
@@ -788,6 +791,14 @@ require('lazy').setup({
           -- Scroll the documentation window [b]ack / [f]orward
           ['<C-b>'] = cmp.mapping.scroll_docs(-4),
           ['<C-f>'] = cmp.mapping.scroll_docs(4),
+
+          ['<Tab>'] = vim.schedule_wrap(function(fallback)
+            if cmp.visible() and has_words_before() then
+              cmp.select_next_item { behavior = cmp.SelectBehavior.Select }
+            else
+              fallback()
+            end
+          end),
 
           -- Accept ([y]es) the completion.
           --  This will auto-import if your LSP supports it.
@@ -828,6 +839,7 @@ require('lazy').setup({
           --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
         },
         sources = {
+          { name = 'copilot', group_index = 2 },
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
