@@ -469,7 +469,7 @@ require('lazy').setup({
         --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
         --  - settings (table): Override the default settings passed when initializing the server.
         --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
-        -- local root_dir = require('lspconfig').util.root_pattern('tailwind.config.js', 'tailwind.config.ts')
+        --local root_dir = require('lspconfig').util.root_pattern('tailwind.config.js', 'tailwind.config.ts')
 
         local servers = {
           -- clangd = {},
@@ -477,6 +477,11 @@ require('lazy').setup({
           templ = {},
           tailwindcss = {
             capabilities = capabilities,
+            cmd = { 'tailwindcss-language-server', '--stdio' },
+            filetypes = { 'typescriptreact', 'typescript.tsx', 'javascriptreact', 'javascript.jsx', 'templ', 'html', 'css' },
+            root_dir = function(fname)
+              return require('lspconfig').util.root_pattern('tailwind.config.js', 'tailwind.config.ts')(fname) or vim.fn.getcwd()
+            end,
             settings = {
               tailwindCSS = {
                 experimental = {
@@ -843,6 +848,7 @@ require('lazy').setup({
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
+          { name = 'tailwindcss' },
           { name = 'bulma', option = {
             filetypes = {
               'templ',
